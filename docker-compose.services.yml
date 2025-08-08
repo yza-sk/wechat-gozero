@@ -1,0 +1,144 @@
+version: '3.8'
+
+# 通用环境变量（从.env文件读取）
+x-common-env: &common-env
+  GO_ENV: production
+  # 核心变量：与配置文件中的${变量}对应
+  SERVER_IP: ${SERVER_IP}
+  JWT_SECRET: ${JWT_SECRET}
+  MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+  REDIS_PASSWORD: ${REDIS_PASSWORD}
+  # 新增变量：覆盖配置文件中的本地服务地址
+  UserRpc__Endpoints: user-rpc:20001
+  GroupRpc__Endpoints: group-rpc:20003
+  MsgRpc__Endpoints: msg-rpc:20002
+  # Kafka配置覆盖（与msg.yaml/group.yaml中的MqConf对应）
+  MqConf__Brokers: ${SERVER_IP}:9093,${SERVER_IP}:9094
+  MqConf__Topic: msg_chat
+
+services:
+  # 用户服务API
+  user-api:
+    build:
+      context: .
+      dockerfile: ./docker/api.Dockerfile
+      args:
+        - FULL_MODULE_PATH=user/api
+        - YAML_NAME=user.yaml
+    restart: always
+    depends_on:
+      - user-rpc
+    environment:
+      <<: *common-env
+    ports:
+      - "10001:10001"  # 对应user (1).yaml的Port
+    volumes:
+      - ./app/user/api/etc:/app/etc  # 挂载配置文件
+    command: ["./api", "-f", "etc/user.yaml"]  # 显式指定配置文件
+#    networks:
+#      - wechat-gozero-network
+
+  # 用户服务RPC
+  user-rpc:
+    build:
+      context: .
+      dockerfile: ./docker/rpc.Dockerfile
+      args:
+        - FULL_MODULE_PATH=user/rpc
+        - YAML_NAME=user.yaml
+    restart: always
+    environment:
+      <<: *common-env
+    ports:
+      - "20001:20001"  # 对应user.yaml的ListenOn
+    volumes:
+      - ./app/user/rpc/etc:/app/etc
+    command: ["./rpc", "-f", "etc/user.yaml"]
+#    networks:
+#      - wechat-gozero-network
+
+  # 群组服务API
+  group-api:
+    build:
+      context: .
+      dockerfile: ./docker/api.Dockerfile
+      args:
+        - FULL_MODULE_PATH=group/api
+        - YAML_NAME=group.yaml
+    restart: always
+    depends_on:
+      - group-rpc
+    environment:
+      <<: *common-env
+    ports:
+      - "10003:10003"  # 对应group (1).yaml的Port
+    volumes:
+      - ./app/group/api/etc:/app/etc
+    command: ["./api", "-f", "etc/group.yaml"]
+#    networks:
+#      - wechat-gozero-network
+
+  # 群组服务RPC
+  group-rpc:
+    build:
+      context: .
+      dockerfile: ./docker/rpc.Dockerfile
+      args:
+        - FULL_MODULE_PATH=group/rpc
+        - YAML_NAME=group.yaml
+    restart: always
+    environment:
+      <<: *common-env
+    ports:
+      - "20003:20003"  # 对应group.yaml的ListenOn
+    volumes:
+      - ./app/group/rpc/etc:/app/etc
+    command: ["./rpc", "-f", "etc/group.yaml"]
+#    networks:
+#      - wechat-gozero-network
+
+  # 消息服务API
+  msg-api:
+    build:
+      context: .
+      dockerfile: ./docker/api.Dockerfile
+      args:
+        - FULL_MODULE_PATH=msg/api
+        - YAML_NAME=msg.yaml
+    restart: always
+    depends_on:
+      - msg-rpc
+      - group-rpc
+    environment:
+      <<: *common-env
+      MqConf__Group: msg-api  # 消息消费组（仅msg-api需要）
+    ports:
+      - "10002:10002"  # 对应msg (1).yaml的Port
+    volumes:
+      - ./app/msg/api/etc:/app/etc
+    command: ["./api", "-f", "etc/msg.yaml"]
+#    networks:
+#      - wechat-gozero-network
+
+  # 消息服务RPC
+  msg-rpc:
+    build:
+      context: .
+      dockerfile: ./docker/rpc.Dockerfile
+      args:
+        - FULL_MODULE_PATH=msg/rpc
+        - YAML_NAME=msg.yaml
+    restart: always
+    environment:
+      <<: *common-env
+    ports:
+      - "20002:20002"  # 对应msg.yaml的ListenOn
+    volumes:
+      - ./app/msg/rpc/etc:/app/etc
+    command: ["./rpc", "-f", "etc/msg.yaml"]
+#    networks:
+#      - wechat-gozero-network
+
+#networks:
+#  wechat-gozero-network:
+#    external: true  # 与环境服务网络共享
