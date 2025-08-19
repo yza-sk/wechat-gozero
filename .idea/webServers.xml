@@ -3,7 +3,7 @@
   <component name="WebServers">
     <option name="servers">
       <webServer id="5028c171-24f0-4a15-9060-f6b3d686d398" name="aliyun1" url="http://8.148.21.13">
-        <fileTransfer rootFolder="/home/goproject" accessType="SFTP" host="8.148.21.13" port="22" sshConfigId="93e00661-b7a2-4eb6-8005-d6bc01dfd0fd" sshConfig="root@8.148.21.13:22 password">
+        <fileTransfer rootFolder="/home/goproject" accessType="SFTP" host="8.148.21.13" port="22" sshConfigId="585298bd-3c9a-4927-b520-014d280b681d" sshConfig="root@8.148.21.13:22 password">
           <advancedOptions>
             <advancedOptions dataProtectionLevel="Private" keepAliveTimeout="0" passiveMode="true" shareSSLContext="true" />
           </advancedOptions>

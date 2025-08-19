@@ -8,9 +8,9 @@ JwtAuth:
 
 Telemetry:
   Name: group-api
-  Endpoint: http://${SERVER_IP}:14268/api/traces
+  Endpoint: http://jaeger:14268/api/traces
   Batcher: jaeger
 
 GroupRpc:
   Endpoints:
-    - ${SERVER_IP}:20003
+    - group-rpc:20003

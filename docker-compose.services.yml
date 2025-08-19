@@ -1,4 +1,4 @@
-version: '3.8'
+version: '3.4'
 
 # 通用环境变量（从.env文件读取）
 x-common-env: &common-env
@@ -35,8 +35,7 @@ services:
     volumes:
       - ./app/user/api/etc:/app/etc  # 挂载配置文件
     command: ["./api", "-f", "etc/user.yaml"]  # 显式指定配置文件
-#    networks:
-#      - wechat-gozero-network
+#    mem_reservation: 150m
 
   # 用户服务RPC
   user-rpc:
@@ -54,8 +53,7 @@ services:
     volumes:
       - ./app/user/rpc/etc:/app/etc
     command: ["./rpc", "-f", "etc/user.yaml"]
-#    networks:
-#      - wechat-gozero-network
+#    mem_reservation: 100m
 
   # 群组服务API
   group-api:
@@ -75,8 +73,7 @@ services:
     volumes:
       - ./app/group/api/etc:/app/etc
     command: ["./api", "-f", "etc/group.yaml"]
-#    networks:
-#      - wechat-gozero-network
+#    mem_reservation: 150m
 
   # 群组服务RPC
   group-rpc:
@@ -94,8 +91,7 @@ services:
     volumes:
       - ./app/group/rpc/etc:/app/etc
     command: ["./rpc", "-f", "etc/group.yaml"]
-#    networks:
-#      - wechat-gozero-network
+#    mem_reservation: 100m
 
   # 消息服务API
   msg-api:
@@ -117,8 +113,7 @@ services:
     volumes:
       - ./app/msg/api/etc:/app/etc
     command: ["./api", "-f", "etc/msg.yaml"]
-#    networks:
-#      - wechat-gozero-network
+#    mem_reservation: 150m
 
   # 消息服务RPC
   msg-rpc:
@@ -136,8 +131,7 @@ services:
     volumes:
       - ./app/msg/rpc/etc:/app/etc
     command: ["./rpc", "-f", "etc/msg.yaml"]
-#    networks:
-#      - wechat-gozero-network
+#    mem_reservation: 100m
 
 #networks:
 #  wechat-gozero-network:
