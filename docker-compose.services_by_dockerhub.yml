@@ -1,0 +1,95 @@
+version: '3.4'
+
+# 通用环境变量（从.env文件读取）
+x-common-env: &common-env
+  GO_ENV: production
+  SERVER_IP: ${SERVER_IP}
+  JWT_SECRET: ${JWT_SECRET}
+  MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+  REDIS_PASSWORD: ${REDIS_PASSWORD}
+  UserRpc__Endpoints: user-rpc:20001
+  GroupRpc__Endpoints: group-rpc:20003
+  MsgRpc__Endpoints: msg-rpc:20002
+  MqConf__Brokers: ${SERVER_IP}:9093,${SERVER_IP}:9094
+  MqConf__Topic: msg_chat
+
+services:
+  # 用户服务API
+  user-api:
+    image: yyzzaa/wechat-gozero-user-api:latest  # 从Docker Hub拉取
+    restart: always
+    depends_on:
+      - user-rpc
+    environment:
+      <<: *common-env
+    ports:
+      - "10001:10001"
+    volumes:
+      - ./app/user/api/etc:/app/etc
+    command: ["./api", "-f", "etc/user.yaml"]
+
+  # 用户服务RPC
+  user-rpc:
+    image: yyzzaa/wechat-gozero-user-rpc:latest
+    restart: always
+    environment:
+      <<: *common-env
+    ports:
+      - "20001:20001"
+    volumes:
+      - ./app/user/rpc/etc:/app/etc
+    command: ["./rpc", "-f", "etc/user.yaml"]
+
+  # 群组服务API
+  group-api:
+    image: yyzzaa/wechat-gozero-group-api:latest
+    restart: always
+    depends_on:
+      - group-rpc
+    environment:
+      <<: *common-env
+    ports:
+      - "10003:10003"
+    volumes:
+      - ./app/group/api/etc:/app/etc
+    command: ["./api", "-f", "etc/group.yaml"]
+
+  # 群组服务RPC
+  group-rpc:
+    image: yyzzaa/wechat-gozero-group-rpc:latest
+    restart: always
+    environment:
+      <<: *common-env
+    ports:
+      - "20003:20003"
+    volumes:
+      - ./app/group/rpc/etc:/app/etc
+    command: ["./rpc", "-f", "etc/group.yaml"]
+
+  # 消息服务API
+  msg-api:
+    image: yyzzaa/wechat-gozero-msg-api:latest
+    restart: always
+    depends_on:
+      - msg-rpc
+      - group-rpc
+    environment:
+      <<: *common-env
+      MqConf__Group: msg-api
+    ports:
+      - "10002:10002"
+    volumes:
+      - ./app/msg/api/etc:/app/etc
+    command: ["./api", "-f", "etc/msg.yaml"]
+
+  # 消息服务RPC
+  msg-rpc:
+    image: yyzzaa/wechat-gozero-msg-rpc:latest
+    restart: always
+    environment:
+      <<: *common-env
+    ports:
+      - "20002:20002"
+    volumes:
+      - ./app/msg/rpc/etc:/app/etc
+    command: ["./rpc", "-f", "etc/msg.yaml"]

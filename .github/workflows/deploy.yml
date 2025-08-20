@@ -1,0 +1,40 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main   # 监听 main 分支的 push 事件
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest   # GitHub 提供的虚拟机环境
+    steps:
+      # 1. 拉取代码
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # 2. 登录 Docker Hub
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}   # Docker Hub 用户名（放在 GitHub secrets 里）
+          password: ${{ secrets.DOCKER_PASSWORD }}   # Docker Hub 密码（放在 GitHub secrets 里）
+
+      # 3. 构建并推送 Docker 镜像
+      - name: Build and push Docker image
+        run: |
+          docker-compose -f docker-compose.yml build
+          docker-compose -f docker-compose.yml push
+
+      # 4. 远程部署
+      - name: Deploy to server
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: ${{ secrets.SERVER_HOST }}      # 服务器 IP
+          username: ${{ secrets.SERVER_USER }}  # SSH 用户名
+          key: ${{ secrets.SERVER_SSH_KEY }}    # 私钥（存放在 GitHub secrets）
+          script: |
+            cd /home/youruser/yourproject   # 服务器上的项目目录
+            git pull origin main            # 更新 compose 文件
+            docker-compose pull             # 拉取最新镜像
+            docker-compose up -d            # 重启服务

@@ -25,6 +25,7 @@ services:
       args:
         - FULL_MODULE_PATH=user/api
         - YAML_NAME=user.yaml
+    image: user-api   # 👈 新增：推送到DockerHub的镜像名
     restart: always
     depends_on:
       - user-rpc
@@ -35,7 +36,7 @@ services:
     volumes:
       - ./app/user/api/etc:/app/etc  # 挂载配置文件
     command: ["./api", "-f", "etc/user.yaml"]  # 显式指定配置文件
-#    mem_reservation: 150m
+  #    mem_reservation: 150m
 
   # 用户服务RPC
   user-rpc:
@@ -45,6 +46,7 @@ services:
       args:
         - FULL_MODULE_PATH=user/rpc
         - YAML_NAME=user.yaml
+    image: user-rpc   # 👈 新增
     restart: always
     environment:
       <<: *common-env
@@ -53,7 +55,7 @@ services:
     volumes:
       - ./app/user/rpc/etc:/app/etc
     command: ["./rpc", "-f", "etc/user.yaml"]
-#    mem_reservation: 100m
+  #    mem_reservation: 100m
 
   # 群组服务API
   group-api:
@@ -63,6 +65,7 @@ services:
       args:
         - FULL_MODULE_PATH=group/api
         - YAML_NAME=group.yaml
+    image: group-api   # 👈 新增
     restart: always
     depends_on:
       - group-rpc
@@ -73,7 +76,7 @@ services:
     volumes:
       - ./app/group/api/etc:/app/etc
     command: ["./api", "-f", "etc/group.yaml"]
-#    mem_reservation: 150m
+  #    mem_reservation: 150m
 
   # 群组服务RPC
   group-rpc:
@@ -83,6 +86,7 @@ services:
       args:
         - FULL_MODULE_PATH=group/rpc
         - YAML_NAME=group.yaml
+    image: group-rpc   # 👈 新增
     restart: always
     environment:
       <<: *common-env
@@ -91,7 +95,7 @@ services:
     volumes:
       - ./app/group/rpc/etc:/app/etc
     command: ["./rpc", "-f", "etc/group.yaml"]
-#    mem_reservation: 100m
+  #    mem_reservation: 100m
 
   # 消息服务API
   msg-api:
@@ -101,6 +105,7 @@ services:
       args:
         - FULL_MODULE_PATH=msg/api
         - YAML_NAME=msg.yaml
+    image: msg-api   # 👈 新增
     restart: always
     depends_on:
       - msg-rpc
@@ -113,7 +118,7 @@ services:
     volumes:
       - ./app/msg/api/etc:/app/etc
     command: ["./api", "-f", "etc/msg.yaml"]
-#    mem_reservation: 150m
+  #    mem_reservation: 150m
 
   # 消息服务RPC
   msg-rpc:
@@ -123,6 +128,7 @@ services:
       args:
         - FULL_MODULE_PATH=msg/rpc
         - YAML_NAME=msg.yaml
+    image: msg-rpc   # 👈 新增
     restart: always
     environment:
       <<: *common-env
