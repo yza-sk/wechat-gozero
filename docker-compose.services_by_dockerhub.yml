@@ -16,7 +16,7 @@ x-common-env: &common-env
 services:
   # 用户服务API
   user-api:
-    image: yyzzaa/wechat-gozero-user-api:latest  # 从Docker Hub拉取
+    image: user-api:latest  # 从Docker Hub拉取
     restart: always
     depends_on:
       - user-rpc
@@ -30,7 +30,7 @@ services:
 
   # 用户服务RPC
   user-rpc:
-    image: yyzzaa/wechat-gozero-user-rpc:latest
+    image: user-rpc:latest
     restart: always
     environment:
       <<: *common-env
@@ -42,7 +42,7 @@ services:
 
   # 群组服务API
   group-api:
-    image: yyzzaa/wechat-gozero-group-api:latest
+    image: group-api:latest
     restart: always
     depends_on:
       - group-rpc
@@ -56,7 +56,7 @@ services:
 
   # 群组服务RPC
   group-rpc:
-    image: yyzzaa/wechat-gozero-group-rpc:latest
+    image: group-rpc:latest
     restart: always
     environment:
       <<: *common-env
@@ -68,7 +68,7 @@ services:
 
   # 消息服务API
   msg-api:
-    image: yyzzaa/wechat-gozero-msg-api:latest
+    image: msg-api:latest
     restart: always
     depends_on:
       - msg-rpc
@@ -84,7 +84,7 @@ services:
 
   # 消息服务RPC
   msg-rpc:
-    image: yyzzaa/wechat-gozero-msg-rpc:latest
+    image: msg-rpc:latest
     restart: always
     environment:
       <<: *common-env
