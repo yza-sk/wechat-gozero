@@ -27,3 +27,4 @@ bin/
 temp/
 deploy/
 .env
+data
